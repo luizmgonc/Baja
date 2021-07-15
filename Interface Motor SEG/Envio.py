@@ -183,15 +183,6 @@ def Pt_Obd_2_setLabels():
 
 def sendSerial():
 
-    ser = serial.Serial(
-        port='COM5',
-        baudrate=115200,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS,
-        timeout=1
-    )
-
     entrada = lista.get()
     i = 0
     for msg in valores:
@@ -209,7 +200,8 @@ def sendSerial():
 
     mensagem = str(msgIndex) + ' ' + str(msg1) + ' ' + str(msg2) + ' ' + str(msg3) + \
         ' ' + str(msg4) + ' ' + str(msg5) + ' ' + str(msg6) + '\n'
-
+    if(not ser.isOpen()):
+        ser.open()
     ser.write(bytes(mensagem, 'utf-8'))
     ser.close()
 
@@ -218,6 +210,18 @@ def sendSerial():
 
 
 # Inicialização Janela
+
+ser = serial.Serial(
+    port='COM5',
+    baudrate=115200,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+    timeout=1
+)
+
+ser.close()
+
 menu = Tk()
 menu.title("Jupiter CAN Interface")
 menu.geometry("%dx%d" % (300 , 380))

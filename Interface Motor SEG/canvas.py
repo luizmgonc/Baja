@@ -1,36 +1,36 @@
-import tkinter as tk
-from PIL import Image
+from tkinter import *
+from tkinter import ttk
+import pygame
+from serial.serialutil import SerialException
+import serial.tools.list_ports
+import serial
+import sys
+import time
+# Inicialização Janela
 
-root = tk.Tk()
-# creating list of PhotoImage objects for each frames
+pygame.mixer.init()
 
-im = [tk.PhotoImage(file=f"images\ezgif-7-80017838cabb-gif-im\\frame_0{i}_delay-0.02s.png") for i in range(10,100)]
+def verificar():
+    pygame.mixer.music.load("D:\Baja\ECI\Git Pessoal\Interface Motor SEG\images\song.wav")
+    pygame.mixer.music.play(loops = -1)
 
-for i in range (100, 214):
-    im.append(tk.PhotoImage(file=f"images\ezgif-7-80017838cabb-gif-im\\frame_{i}_delay-0.02s.png"))
 
-count = 0
-anim = None
-def animation(count):
-    global anim
-    im2 = im[count]
+menu = Tk()
+menu.title("Configuração Porta Serial")
+menu.geometry("%dx%d" % (400, 150))
 
-    gif_label.configure(image=im2)
-    count += 1
-    if count == 200:
-        count = 0
-    anim = root.after(50,lambda :animation(count))
 
-def stop_animation():
-    root.after_cancel(anim)
+# Inicialização Widgets
 
-gif_label = tk.Label(root,image="")
-gif_label.pack()
+label0 = Label(menu, text="Porta Serial:")
 
-start = tk.Button(root,text="start",command=lambda :animation(count))
-start.pack()
+enviarButton = Button(text="Enviar", command=verificar)
+succedLabel = Label(menu, text = '')
 
-stop = tk.Button(root,text="stop",command=stop_animation)
-stop.pack()
 
-root.mainloop()
+# Pack
+label0.pack(pady=10)
+enviarButton.pack(pady=(0, 15))
+succedLabel.pack()
+
+menu.mainloop()
