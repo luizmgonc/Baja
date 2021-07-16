@@ -59,7 +59,6 @@ def send_Pt_Edrv_Des_1():
     else:
         pop("É necessário pausar o recebimento antes de enviar!")
 
-
 def send_Eem_Edrv_Lim_1():
 
     if pause:
@@ -84,7 +83,6 @@ def send_Eem_Edrv_Lim_1():
     else:
         pop("É necessário pausar o recebimento antes de enviar!")
 
-
 def send_Eem_Edrv_Pred_1():
 
     if pause:
@@ -107,7 +105,6 @@ def send_Eem_Edrv_Pred_1():
     else:
         pop("É necessário pausar o recebimento antes de enviar!")
 
-
 def send_Eem_Edrv_Des_1():
     if pause:
 
@@ -126,7 +123,6 @@ def send_Eem_Edrv_Des_1():
             ser.close()
     else:
         pop("É necessário pausar o recebimento antes de enviar!")
-
 
 def send_Pt_Veh_1():
     if pause:
@@ -155,8 +151,8 @@ def send_Pt_Veh_1():
 def atualizarPortas():
     global atualizar
     ports = serial.tools.list_ports.comports()
-    lista["values"] = ports
-    atualizar = menuSerial.after(100, atualizarPortas)
+    portaLista["values"] = ports
+    atualizar = menu.after(500, atualizarPortas)
 
 
 def animation(count):
@@ -198,7 +194,6 @@ def pausar():
     pause = not pause
     print(pause)
 
-
 def receiveSerial():
 
     while(True):
@@ -212,6 +207,8 @@ def receiveSerial():
                 print(lista)
                 atualizarInterface(lista)
                 ser.close()
+                portaLabel['text'] = "OK!"
+                portaLabel['fg'] = "green"
             except IndexError:
                 pass
             except:
@@ -295,10 +292,10 @@ def carregarGif():
             file=f"images\ezgif-7-80017838cabb-gif-im\\frame_{i}_delay-0.02s.png"))
 
 
-def verificar():
+def verificar(v):
     try:
         global ser
-        entrada = lista.get()
+        entrada = portaLista.get()
         separada = entrada.split()
 
         ser = serial.Serial(
@@ -309,45 +306,20 @@ def verificar():
             bytesize=serial.EIGHTBITS,
             timeout=1
         )
-
         ser.close()
         print(ser)
-        succedLabel['text'] = "Conexão bem sucedida!"
-        succedLabel['fg'] = "green"
-        menuSerial.after_cancel(atualizar)
-        menuSerial.after(600, menuSerial.destroy)
-
+        portaLabel['text'] = "OK!"
+        portaLabel['fg'] = "green"
     except:
-        succedLabel['text'] = "Conexão mal sucedida! Tente novamente."
-        succedLabel['fg'] = "red"
-        succedLabel.pack()
+        portaLabel['text'] = "Erro!"
+        portaLabel['fg'] = "red"
         traceback.print_exc()
 
 
 # Inicialização Janela Serial
 ser = serial.Serial()
-menuSerial = Tk()
-menuSerial.title("Configuração Porta Serial")
-menuSerial.geometry("%dx%d+%d+%d" % (400, 150, 560, 300))
 
-# Listagem portas Seriais
-ports = serial.tools.list_ports.comports()
 
-# Inicialização Widgets
-label0 = Label(menuSerial, text="Porta Serial:")
-lista = ttk.Combobox(menuSerial, values=ports, width=50)
-enviarButton = Button(text="Conectar", command=verificar)
-succedLabel = Label(menuSerial, text='')
-
-atualizarPortas()
-
-# Pack
-label0.pack(pady=10)
-lista.pack(pady=(0, 10))
-enviarButton.pack(pady=(0, 15))
-succedLabel.pack()
-
-menuSerial.mainloop()
 # -------------------------------------------------------
 
 
@@ -356,7 +328,7 @@ menuSerial.mainloop()
 menu = Tk()
 menu.title("Jupiter CAN Interface")
 menu.geometry("%dx%d+%d+%d" % (836, 746, 340, 25))
-menu.resizable(False, False)
+# menu.resizable(False, False)
 
 # Variáveis Globais
 checksumActualTorque = StringVar()
@@ -404,6 +376,7 @@ leoFrame = Frame(menu, bg="#0b7aa5", bd=3, relief=SOLID)
 dataButtonsFrame = Frame(menu, bd=5, relief=SOLID, bg="black")
 buttonsFrame = Frame(dataButtonsFrame, bg="black")
 buttonFrame = Frame(buttonsFrame, bg="black")
+comFrame = Frame(buttonsFrame, bg = "black")
 dataFrame = Frame(dataButtonsFrame, bd=1, relief=SOLID)
 
 leftFrame = Frame(menu)
@@ -495,6 +468,8 @@ initButton = Button(buttonFrame, text="Iniciar recebimento",
                     command=serialThread.start)
 pauseButton = Button(buttonFrame, text="Pause / Unpause", command=pausar)
 
+
+
 my_jup = Image.open("images\jUPITER_vetorizado.png")
 resized = my_jup.resize((230, 40), Image.ANTIALIAS)
 new_jup = ImageTk.PhotoImage(resized)
@@ -506,6 +481,10 @@ resized = my_bot.resize((100, 100), Image.ANTIALIAS)
 new_bot = ImageTk.PhotoImage(resized)
 dangerButton = Button(buttonsFrame, image=new_bot, bd=0,
                       command=resize, bg="black", activebackground="black")
+
+portaLista = ttk.Combobox(comFrame, width=8, state="readonly")
+portaLabel = Label(comFrame, text = "", bg = "black")
+
 
 label = Label(leoFrame, bd=0)
 
@@ -675,12 +654,15 @@ chargeFrame.grid(row = 1, column = 0)
 leftFrame.grid()
 
 # Grid Button Frame
-initButton.grid(row=0, padx=(30, 0), pady=(15, 10))
-pauseButton.grid(row=1, padx=(30, 0), pady=(0, 15))
+initButton.grid(row=0, padx=(0, 0), pady=(15, 10))
+pauseButton.grid(row=1, padx=(0, 0), pady=(0, 15))
 buttonFrame.grid(row=0)
 
 # Grid Buttons Frame
-dangerButton.grid(row=0, column=1,  padx=(40, 20))
+dangerButton.grid(row=0, column=1,  padx=(10, 10))
+portaLista.grid()
+portaLabel.grid()
+comFrame.grid(row=0, column=2)
 buttonsFrame.grid()
 
 # Grid Data Frame
@@ -697,6 +679,8 @@ jupiter.grid(row=4, column=0, pady=(10, 10))
 dataButtonsFrame.grid(row=0, column=1)
 
 carregarGif()
+atualizarPortas()
+portaLista.bind("<<ComboboxSelected>>", verificar)
 
 # Grid Léo Dançando Frame
 label["image"] = im[0]
