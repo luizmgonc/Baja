@@ -10,7 +10,109 @@ import traceback
 
 from serial.serialutil import SerialException
 
+
+def send_Pt_Edrv_Des_1():
+    if pause:
+        msg1 = entry1.get()
+        msg2 = entry2.get()
+        msg3 = entry3.get()
+        msg4 = entry4.get()
+        mensagem = str(1) + ' ' + str(msg1) + ' ' + str(msg2) + ' ' + str(msg3) + \
+            ' ' + str(msg4) + '\n'
+
+        if(not ser.isOpen()):
+            ser.open()
+        ser.write(bytes(mensagem, 'utf-8'))
+        ser.close()
+    else:
+        popPause()
+
+
+def send_Eem_Edrv_Lim_1():
+
+    if pause:
+        msg1 = entry5.get()
+        msg2 = entry6.get()
+        msg3 = entry7.get()
+        msg4 = entry8.get()
+        msg5 = entry9.get()
+        msg6 = entry10.get()
+
+        mensagem = str(2) + ' ' + str(msg1) + ' ' + str(msg2) + ' ' + str(msg3) + \
+            ' ' + str(msg4) + ' ' + str(msg5) + ' ' + str(msg6) + '\n'
+
+        if(not ser.isOpen()):
+            ser.open()
+
+        ser.write(bytes(mensagem, 'utf-8'))
+        ser.close()
+    else:
+        popPause()
+
+
+def send_Eem_Edrv_Pred_1():
+
+    if pause:
+        msg1 = entry11.get()
+        msg2 = entry12.get()
+        msg3 = entry13.get()
+        msg4 = entry14.get()
+
+        mensagem = str(3) + ' ' + str(msg1) + ' ' + str(msg2) + ' ' + str(msg3) + \
+            ' ' + str(msg4) + '\n'
+
+        if(not ser.isOpen()):
+            ser.open()
+
+        ser.write(bytes(mensagem, 'utf-8'))
+        ser.close()
+    else:
+        popPause()
+
+
+def send_Eem_Edrv_Des_1():
+    if pause:
+
+        msg1 = entry15.get()
+        msg2 = entry16.get()
+
+        mensagem = str(4) + ' ' + str(msg1) + ' ' + str(msg2) + '\n'
+
+        if(not ser.isOpen()):
+            ser.open()
+
+        ser.write(bytes(mensagem, 'utf-8'))
+        ser.close()
+    else:
+        popPause()
+
+
+def send_Pt_Veh_1():
+    if pause:
+
+        msg1 = entry17.get()
+        msg2 = entry18.get()
+        msg3 = entry19.get()
+
+        mensagem = str(5) + ' ' + str(msg1) + ' ' + \
+            str(msg2) + ' ' + str(msg3) + '\n'
+
+        if(not ser.isOpen()):
+            ser.open()
+
+        ser.write(bytes(mensagem, 'utf-8'))
+        ser.close()
+    else:
+        popPause()
+
 # Funções
+
+
+def atualizarPortas():
+    global atualizar
+    ports = serial.tools.list_ports.comports()
+    lista["values"] = ports
+    atualizar = menuSerial.after(100, atualizarPortas)
 
 
 def animation(count):
@@ -26,16 +128,16 @@ def animation(count):
 
 def resize():
     global colorCount
-    if(menu.winfo_width() == 762):
+    if(menu.winfo_width() == 1231):
         print(menu.winfo_width())
-        menu.geometry("%dx%d+%d+%d" % (366, 746, 560, 25))
+        menu.geometry("%dx%d+%d+%d" % (836, 746, 340, 25))
         pygame.mixer.music.stop()
 
         menu.after_cancel(anim)
 
     else:
         print(menu.winfo_width())
-        menu.geometry("%dx%d+%d+%d" % (762, 746, 360, 25))
+        menu.geometry("%dx%d+%d+%d" % (1231, 746, 140, 25))
         colorCount += 1
         animation(0)
         pygame.mixer.music.load("images\song.wav")
@@ -55,26 +157,27 @@ def pausar():
 
 def receiveSerial():
 
-    while(not fim):
+    while(True):
 
-        try:
-            while(not pause):
-
+        while(not pause):
+            try:
                 if(not ser.isOpen()):
                     ser.open()
                 mensagem = ser.readline()
                 lista = mensagem.decode("utf-8").split()
+                print(lista)
                 atualizarInterface(lista)
+                ser.close()
+            except IndexError:
+                pass
+            except:
+                traceback.print_exc()
+        time.sleep(0.05)
 
-            time.sleep(0.05)
-        except:
-            traceback.print_exc()
-
-        print("HEre 3")
+        print("Paused")
         ser.close()
 
-        # time.sleep(0.01)
-    print("HEre 3")
+        time.sleep(0.01)
 
 
 def atualizarInterface(lista):
@@ -151,7 +254,6 @@ def carregarGif():
 def verificar():
     try:
         global ser
-        global su
         entrada = lista.get()
         separada = entrada.split()
 
@@ -168,7 +270,8 @@ def verificar():
         print(ser)
         succedLabel['text'] = "Conexão bem sucedida!"
         succedLabel['fg'] = "green"
-        menuSerial.after(800, menuSerial.destroy)
+        menuSerial.after_cancel(atualizar)
+        menuSerial.after(600, menuSerial.destroy)
 
     except:
         succedLabel['text'] = "Conexão mal sucedida! Tente novamente."
@@ -185,13 +288,14 @@ menuSerial.geometry("%dx%d+%d+%d" % (400, 150, 560, 300))
 
 # Listagem portas Seriais
 ports = serial.tools.list_ports.comports()
-valores = ports
 
 # Inicialização Widgets
 label0 = Label(menuSerial, text="Porta Serial:")
-lista = ttk.Combobox(menuSerial, values=valores, width=50)
-enviarButton = Button(text="Enviar", command=verificar)
+lista = ttk.Combobox(menuSerial, values=ports, width=50)
+enviarButton = Button(text="Conectar", command=verificar)
 succedLabel = Label(menuSerial, text='')
+
+atualizarPortas()
 
 # Pack
 label0.pack(pady=10)
@@ -207,8 +311,8 @@ menuSerial.mainloop()
 
 menu = Tk()
 menu.title("Jupiter CAN Interface")
-menu.geometry("%dx%d+%d+%d" % (366, 746, 560, 25))
-menu.resizable(False, False)
+menu.geometry("%dx%d+%d+%d" % (836, 746, 340, 25))
+# menu.resizable(False, False)
 
 # Variáveis Globais
 checksumActualTorque = StringVar()
@@ -238,7 +342,6 @@ minimumAvailableTorque = StringVar()
 actualDeratingState = StringVar()
 
 pause = False
-fim = False
 
 count = 0
 anim = None
@@ -259,6 +362,70 @@ buttonsFrame = Frame(dataButtonsFrame, bg="black")
 buttonFrame = Frame(buttonsFrame, bg="black")
 dataFrame = Frame(dataButtonsFrame, bd=1, relief=SOLID)
 
+sendFrame = Frame(menu)
+
+Pt_Edrv_Des_1_Frame = Frame(sendFrame)
+Eem_Edrv_Lim_1_Frame = Frame(sendFrame)
+Eem_Edrv_Pred_1_Frame = Frame(sendFrame)
+
+twoFrame = Frame(sendFrame)
+
+Eem_Edrv_Des_1_Frame = Frame(twoFrame)
+Pt_Veh_1_Frame = Frame(twoFrame)
+
+# Entrys
+
+label1 = Label(Pt_Edrv_Des_1_Frame, text="Operation Mode Request")
+label2 = Label(Pt_Edrv_Des_1_Frame, text="Torque Request")
+label3 = Label(Pt_Edrv_Des_1_Frame, text="Minimum Torque")
+label4 = Label(Pt_Edrv_Des_1_Frame, text="Speed Request")
+label5 = Label(Eem_Edrv_Lim_1_Frame, text="Maximum Allowed Voltage")
+label6 = Label(Eem_Edrv_Lim_1_Frame, text="Minimum Allowed Voltage")
+label7 = Label(Eem_Edrv_Lim_1_Frame, text="Estimated Battery Resistance")
+label8 = Label(Eem_Edrv_Lim_1_Frame, text="Current Calculation Eem")
+label9 = Label(Eem_Edrv_Lim_1_Frame, text="Maximum Allowed Current")
+label10 = Label(Eem_Edrv_Lim_1_Frame, text="Minimum Allowed Current")
+label11 = Label(Eem_Edrv_Pred_1_Frame, text="Predicted Maximum Voltage")
+label12 = Label(Eem_Edrv_Pred_1_Frame, text="Predicted Minimum Voltage")
+label13 = Label(Eem_Edrv_Pred_1_Frame, text="Predicted Minimum Current")
+label14 = Label(Eem_Edrv_Pred_1_Frame, text="Predicted Maximum Current")
+label15 = Label(Eem_Edrv_Des_1_Frame, text="Charging Voltage Request")
+label16 = Label(Eem_Edrv_Des_1_Frame, text="Battery Relay State")
+label17 = Label(Pt_Veh_1_Frame, text="Ignition Switch State")
+label18 = Label(Pt_Veh_1_Frame, text="E-Drive Shut-Off Time")
+label19 = Label(Pt_Veh_1_Frame, text="Crash Flag")
+
+entry1 = Entry(Pt_Edrv_Des_1_Frame)
+entry2 = Entry(Pt_Edrv_Des_1_Frame)
+entry3 = Entry(Pt_Edrv_Des_1_Frame)
+entry4 = Entry(Pt_Edrv_Des_1_Frame)
+entry5 = Entry(Eem_Edrv_Lim_1_Frame)
+entry6 = Entry(Eem_Edrv_Lim_1_Frame)
+entry7 = Entry(Eem_Edrv_Lim_1_Frame)
+entry8 = Entry(Eem_Edrv_Lim_1_Frame)
+entry9 = Entry(Eem_Edrv_Lim_1_Frame)
+entry10 = Entry(Eem_Edrv_Lim_1_Frame)
+entry11 = Entry(Eem_Edrv_Pred_1_Frame)
+entry12 = Entry(Eem_Edrv_Pred_1_Frame)
+entry13 = Entry(Eem_Edrv_Pred_1_Frame)
+entry14 = Entry(Eem_Edrv_Pred_1_Frame)
+entry15 = Entry(Eem_Edrv_Des_1_Frame)
+entry16 = Entry(Eem_Edrv_Des_1_Frame)
+entry17 = Entry(Pt_Veh_1_Frame)
+entry18 = Entry(Pt_Veh_1_Frame)
+entry19 = Entry(Pt_Veh_1_Frame)
+
+button1 = Button(Pt_Edrv_Des_1_Frame, text="Enviar",
+                 command=send_Pt_Edrv_Des_1)
+button2 = Button(Eem_Edrv_Lim_1_Frame, text="Enviar",
+                 command=send_Eem_Edrv_Lim_1)
+button3 = Button(Eem_Edrv_Pred_1_Frame, text="Enviar",
+                 command=send_Eem_Edrv_Pred_1)
+button4 = Button(Eem_Edrv_Des_1_Frame, text="Enviar",
+                 command=send_Eem_Edrv_Des_1)
+button5 = Button(Pt_Veh_1_Frame, text="Enviar", command=send_Pt_Veh_1)
+
+
 # Instanciação de Widgets
 
 initButton = Button(buttonFrame, text="Iniciar recebimento",
@@ -277,7 +444,7 @@ new_bot = ImageTk.PhotoImage(resized)
 dangerButton = Button(buttonsFrame, image=new_bot, bd=0,
                       command=resize, bg="black", activebackground="black")
 
-label = Label(leoFrame, bd =0)
+label = Label(leoFrame, bd=0)
 
 
 # Criação de Labels de Dados
@@ -373,6 +540,72 @@ Label(edrvPredVariablesFrame, textvariable=actualDeratingState,
 
 # -------------------------------------------------------
 
+# Grid Pt_Edrv_Des_1_Frame
+label1.grid()
+entry1.grid()
+label2.grid()
+entry2.grid()
+label3.grid()
+entry3.grid()
+label4.grid()
+entry4.grid()
+button1.grid(pady=(10, 0))
+Pt_Edrv_Des_1_Frame.grid(row=0, column=0, padx=(50, 70))
+
+# Grid Eem_Edrv_Lim_1_Frame
+label5.grid()
+entry5.grid()
+label6.grid()
+entry6.grid()
+label7.grid()
+entry7.grid()
+label8.grid()
+entry8.grid()
+label9.grid()
+entry9.grid()
+label10.grid()
+entry10.grid()
+button2.grid(pady=(10, 0))
+Eem_Edrv_Lim_1_Frame.grid(row=1, column=0, pady=60, sticky=N)
+
+# Grid Eem_Edrv_Pred_1_Frame
+
+label11.grid()
+entry11.grid()
+label12.grid()
+entry12.grid()
+label13.grid()
+entry13.grid()
+label14.grid()
+entry14.grid()
+button3.grid(pady=(10, 0))
+Eem_Edrv_Pred_1_Frame.grid(row=0, column=1, padx=(0, 50))
+
+# Grid Eem_Edrv_Des_1_Frame
+label15.grid()
+entry15.grid()
+label16.grid()
+entry16.grid()
+button4.grid(pady=(10, 50))
+
+Eem_Edrv_Des_1_Frame.grid(row=1, column=1)
+
+# Grid Pt_Veh_1_Frame
+
+label17.grid()
+entry17.grid()
+label18.grid()
+entry18.grid()
+label19.grid()
+entry19.grid()
+button5.grid(pady=(10, 0))
+Pt_Veh_1_Frame.grid(row=2, column=1)
+
+twoFrame.grid(row=1, column=1, pady=60, padx=(0, 50), sticky=N)
+
+sendFrame.grid(row=0, column=0)
+
+
 # Grid Button Frame
 initButton.grid(row=0, padx=(30, 0), pady=(15, 10))
 pauseButton.grid(row=1, padx=(30, 0), pady=(0, 15))
@@ -393,13 +626,13 @@ dataFrame.grid(row=1)
 
 # Grid Data and Buttons Frame
 jupiter.grid(row=4, column=0, pady=(10, 10))
-dataButtonsFrame.grid(row=0, column=0)
+dataButtonsFrame.grid(row=0, column=1)
 
 carregarGif()
 
 # Grid Léo Dançando Frame
 label["image"] = im[0]
 label.grid(pady=50, padx=20)
-leoFrame.grid(row=0, column=1)
+leoFrame.grid(row=0, column=2)
 
 menu.mainloop()

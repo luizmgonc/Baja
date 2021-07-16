@@ -12,7 +12,7 @@ pygame.mixer.init()
 
 def verificar():
     pygame.mixer.music.load("D:\Baja\ECI\Git Pessoal\Interface Motor SEG\images\song.wav")
-    pygame.mixer.music.play(loops = -1)
+    pygame.mixer.music.play()
 
 
 menu = Tk()

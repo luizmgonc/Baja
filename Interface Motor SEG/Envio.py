@@ -181,6 +181,10 @@ def Pt_Obd_2_setLabels():
     entry5.delete(0, END)
     entry6.delete(0, END)
 
+
+
+
+
 def sendSerial():
 
     entrada = lista.get()
@@ -204,8 +208,6 @@ def sendSerial():
         ser.open()
     ser.write(bytes(mensagem, 'utf-8'))
     ser.close()
-
-
     
 
 
